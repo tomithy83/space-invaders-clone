@@ -9,14 +9,16 @@ bg = "black"
 fg = "white"
 title = 'Space Invaders Clone'
 bdrwidth = 3
+playerspeed = 15
+buffer = 0.46
 
 
+#create the screen
+scrn = turtle.Screen()
+scrn.bgcolor(bg)
+scrn.title(title)
 
-def newscreen(color, name):
-	#create the screen
-	scrn = turtle.Screen()
-	scrn.bgcolor(color)
-	scrn.title(name)
+	
 
 #create the border
 def draw_border(color):
@@ -36,32 +38,39 @@ def draw_border(color):
 			border_pen.forward(height)
 		border_pen.lt(90)
 
-def mkplayer(color,speed):
-	player = turtle.Turtle()
-	player.speed(0)
-	player.up()
-	player.color(color)
-	player.sety(-height*7/16)
-	player.lt(90)
-	playerspeed = speed
+
+player = turtle.Turtle()
+player.speed(0)
+player.up()
+player.color(fg)
+player.sety(-height*buffer)
+player.lt(90)
 
 #move player left
 def moveleft():
-	player.setx(player.corx()-playerspeed)
-	if player.corx() < (-width * 7/16):
-		player.setx(-width * 7/16)
+	player.setx(player.xcor()-playerspeed)
+	if player.xcor() < (-width * buffer):
+		player.setx(-width * buffer)
 
 #move player right
 def moveright():
-	player.setx(player.corx()+playerspeed)
-	if player.corx() < (width * 7/16):
-		player.setx(width * 7/16)
+	player.setx(player.xcor()+ playerspeed)
+	if player.xcor() > (width * buffer):
+		player.setx(width * buffer)
 
-newscreen(bg,title)
+def getclickcoor(x,y):
+#	player.goto(x,y)
+#	moveright()
+	if x > 20:
+		moveright()
+	if x < -20:
+		moveleft()
+
+
 draw_border(fg)
-mkplayer(fg,15)
+scrn.onclick(getclickcoor)
+scrn.listen()
 
 
-while True:
-	continue
 	
+turtle.mainloop()
