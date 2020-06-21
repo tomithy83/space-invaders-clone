@@ -48,7 +48,7 @@ def draw_border(color):
 			border_pen.forward(height)
 		border_pen.lt(90)
 
-class player():
+class player:
 	playerspeed = 15
 	
 	def __init__(self, color):
@@ -58,7 +58,7 @@ class player():
 		self.t.color(color)
 		self.t.sety(-height*buffer)
 		self.t.lt(90)
-		self.testmsg = 'test'
+
 
 	#move player left
 	def moveleft(self):
@@ -74,6 +74,28 @@ class player():
 		if self.t.xcor() > (width * buffer):
 			self.t.setx(width * buffer)
 
+class enemy:
+	enemyspeed = 2
+	
+	def __init__(self,color,shape):
+		self.t = turtle.Turtle()
+		self.t.speed(0)
+		self.t.up()
+		self.t.shape(shape)
+		self.t.color(color)
+		self.t.goto(-width*buffer, height*buffer)
+		
+	def movement(self):
+		self.t.setx(self.t.xcor()+ enemy.enemyspeed)
+		if self.t.xcor() > width*buffer:
+			self.t.goto(width*buffer -2, self.t.ycor() - 20)
+			enemy.enemyspeed *= (-1)
+		if self.t.xcor() < -width*buffer:
+			self.t.goto(-width*buffer +2, self.t.ycor() - 20)
+			enemy.enemyspeed *= (-1)
+			
+	
+	
 def getclickcoor(x,y):
 	drwmsg('the click registered x: ' + str(x) + 'y: ' + str(y))
 	if x > 20:
@@ -84,6 +106,7 @@ def getclickcoor(x,y):
 #		drwmsg('<-20')
 
 player1 = player(fg)
+enemy1 = enemy('red','circle')
 #drwmsg(player1.__dict__)
 draw_border(fg)
 scrn.onclick(getclickcoor)
@@ -91,4 +114,6 @@ scrn.listen()
 
 
 	
-turtle.mainloop()
+while True:
+	enemy1.movement()
+	continue
