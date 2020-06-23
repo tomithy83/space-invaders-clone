@@ -51,12 +51,14 @@ def draw_border(color):
 class player:
 	playerspeed = 15
 	
-	def __init__(self, color):
+	def __init__(self, color, shape='triangle',x=0, y=(-height*buffer)):
 		self.t = turtle.Turtle()
 		self.t.speed(0)
 		self.t.up()
+		self.t.shape(shape)
+		self.t.shapesize(1.5,1.5)
 		self.t.color(color)
-		self.t.sety(-height*buffer)
+		self.t.goto(x,y)
 		self.t.lt(90)
 
 
@@ -77,13 +79,13 @@ class player:
 class enemy:
 	enemyspeed = 2
 	
-	def __init__(self,color,shape):
+	def __init__(self,color,shape,x=(-width*buffer),y=(height*buffer)):
 		self.t = turtle.Turtle()
 		self.t.speed(0)
 		self.t.up()
 		self.t.shape(shape)
 		self.t.color(color)
-		self.t.goto(-width*buffer, height*buffer)
+		self.t.goto(x,y)
 		
 	def movement(self):
 		self.t.setx(self.t.xcor()+ enemy.enemyspeed)
@@ -94,10 +96,45 @@ class enemy:
 			self.t.goto(-width*buffer +2, self.t.ycor() - 20)
 			enemy.enemyspeed *= (-1)
 			
-	
+class bullet:
+	bulletspeed = 20
+	def __init__(self,color,shape='triangle',x=10000,y=0,speedmultiplyer=(1)):
+		self.t = turtle.Turtle()
+		self.t.speed(0)
+#		self.t.hideturtle()
+		self.t.up()
+		self.t.shape(shape)
+		self.t.shapesize(0.5,0.5)
+		self.t.color(color)
+		self.t.goto(x,y)
+		self.t.state = 'ready'
+		self.t.speedmultiplyer = speedmultiplyer
+		if speedmultiplyer >= 0:
+			self.t.lt(90)
+		else:
+			self.t.lt(270)
+		
+	def firebullet(self,origin):
+		if self.t.state == 'ready':
+			self.t.state ='fire'
+			self.t.goto(origin.t.xcor(),origin.t.ycor())
+			self.t.showturtle()
+		
+	def movebullet(self):
+		if self.t.state == 'fire':
+			newy= self.t.ycor()+(bullet.bulletspeed*self.t.speedmultiplyer)
+			self.t.sety(newy)
+		if self.t.ycor() > height*buffer:
+#			drwmsg('passed boundry')
+			self.t.state = 'ready'
+			self.t.goto(10000,0)
+			
+			
+			
 	
 def getclickcoor(x,y):
-	drwmsg('the click registered x: ' + str(x) + 'y: ' + str(y))
+#	drwmsg('the click registered x: ' + str(x) + 'y: ' + str(y))
+	playerbullet1.firebullet(player1)
 	if x > 20:
 		player1.moveright()
 #		drwmsg('>20')
@@ -105,9 +142,17 @@ def getclickcoor(x,y):
 		player1.moveleft()
 #		drwmsg('<-20')
 
+#create player1
 player1 = player(fg)
-enemy1 = enemy('red','circle')
 #drwmsg(player1.__dict__)
+
+#create enemies
+enemy1 = enemy('red','circle')
+#drwmsg(enemy1.__dict__)
+
+#create player bullet
+playerbullet1 = bullet('yellow')
+
 draw_border(fg)
 scrn.onclick(getclickcoor)
 scrn.listen()
@@ -116,4 +161,5 @@ scrn.listen()
 	
 while True:
 	enemy1.movement()
+	playerbullet1.movebullet()
 	continue
