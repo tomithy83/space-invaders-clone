@@ -2,6 +2,7 @@
 
 import turtle
 import random
+import math
 
 width = 650
 height = 1050
@@ -11,7 +12,8 @@ title = 'Space Invaders Clone'
 bdrwidth = 3
 playerspeed = 15
 buffer = 0.46
-
+numofenemies = 20
+enemies =[]
 
 #create the screen
 scrn = turtle.Screen()
@@ -98,7 +100,7 @@ class enemy:
 			
 class bullet:
 	bulletspeed = 20
-	def __init__(self,color,shape='triangle',x=10000,y=0,speedmultiplyer=(1)):
+	def __init__(self,color,shape='triangle',x=10000,y=0,speedmultiplyer=1):
 		self.t = turtle.Turtle()
 		self.t.speed(0)
 #		self.t.hideturtle()
@@ -129,8 +131,6 @@ class bullet:
 			self.t.state = 'ready'
 			self.t.goto(10000,0)
 			
-			
-			
 	
 def getclickcoor(x,y):
 #	drwmsg('the click registered x: ' + str(x) + 'y: ' + str(y))
@@ -142,16 +142,28 @@ def getclickcoor(x,y):
 		player1.moveleft()
 #		drwmsg('<-20')
 
+
+#create player bullet
+playerbullet1 = bullet('yellow')
+
 #create player1
 player1 = player(fg)
 #drwmsg(player1.__dict__)
 
 #create enemies
-enemy1 = enemy('red','circle')
+#enemy1 = enemy('red','circle')
 #drwmsg(enemy1.__dict__)
+for i in range(numofenemies):
+	enemyx = (-width*buffer)+(30*(i%5))
+	enemyy = (height*buffer)-(30*math.floor(i/5))
+	i = enemy('red','circle',x=enemyx,y=enemyy)
+	enemies.append(i)
+	
+	
+#for enemy in enemies:
+#	enemy = enemy('red','circle',x=(-width*buffer)+(I*30),y=(height*buffer)
+#	drwmsg(enemies)
 
-#create player bullet
-playerbullet1 = bullet('yellow')
 
 draw_border(fg)
 scrn.onclick(getclickcoor)
@@ -160,6 +172,8 @@ scrn.listen()
 
 	
 while True:
-	enemy1.movement()
+	for i in enemies:
+		i.movement()
+
 	playerbullet1.movebullet()
 	continue
