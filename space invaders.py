@@ -19,6 +19,7 @@ enemies =[]
 scrn = turtle.Screen()
 scrn.bgcolor(bg)
 scrn.title(title)
+scrn.tracer(0)
 
 #create the debug pen
 debugpen = turtle.Turtle()
@@ -81,22 +82,32 @@ class player:
 class enemy:
 	enemyspeed = 2
 	
-	def __init__(self,color,shape,x=(-width*buffer),y=(height*buffer)):
+	def __init__(self,color,shape,x=(-width*buffer),y=(height*buffer),state='alive'):
 		self.t = turtle.Turtle()
 		self.t.speed(0)
 		self.t.up()
 		self.t.shape(shape)
 		self.t.color(color)
 		self.t.goto(x,y)
+		self.state = 'alive'
 		
 	def movement(self):
 		self.t.setx(self.t.xcor()+ enemy.enemyspeed)
 		if self.t.xcor() > width*buffer:
-			self.t.goto(width*buffer -2, self.t.ycor() - 20)
+			for i in enemies:
+				i.t.goto(i.t.xcor() -2, i.t.ycor() - 20)
 			enemy.enemyspeed *= (-1)
 		if self.t.xcor() < -width*buffer:
-			self.t.goto(-width*buffer +2, self.t.ycor() - 20)
+			for i in enemies:
+				i.t.goto(i.t.xcor() +2, i.t.ycor() - 20)
 			enemy.enemyspeed *= (-1)
+			
+	def enemydestruction(self):
+		self.state = 'dead'
+		self.t.goto(-10000,0)
+			
+			
+		
 			
 class bullet:
 	bulletspeed = 20
@@ -128,8 +139,12 @@ class bullet:
 			self.t.sety(newy)
 		if self.t.ycor() > height*buffer:
 #			drwmsg('passed boundry')
-			self.t.state = 'ready'
-			self.t.goto(10000,0)
+			self.resetbullet()
+	
+	
+	def resetbullet(self):
+		self.t.state = 'ready'
+		self.t.goto(10000,0)
 			
 	
 def getclickcoor(x,y):
@@ -142,7 +157,19 @@ def getclickcoor(x,y):
 		player1.moveleft()
 #		drwmsg('<-20')
 
-
+#check for collisions between turtles
+def iscollision(t1,t2):
+	distance = math.sqrt(math.pow(t1.xcor()-t2.xcor(),2)+math.pow(t1.ycor()-t2.ycor(),2))
+	if distance <15:
+		#drwmsg('True')
+		return True
+	else:
+		#drwmsg('False')
+		return False
+	#drwmsg(distance)
+	
+	
+	
 #create player bullet
 playerbullet1 = bullet('yellow')
 
@@ -173,7 +200,12 @@ scrn.listen()
 	
 while True:
 	for i in enemies:
-		i.movement()
+		if i.state == 'alive':
+			i.movement()
+		if iscollision (i.t, playerbullet1.t):
+			playerbullet1.resetbullet()
+			i.enemydestruction()
 
 	playerbullet1.movebullet()
+	scrn.update()
 	continue
